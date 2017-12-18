@@ -1,7 +1,5 @@
 import os
 
-os.chdir("/Users/Pierre/Desktop/Stage_4A/Poisson_Schrodinger/Simulations/src/")
-
 execfile("Schrodinger.py")
 execfile("Poisson.py")
 execfile("DOS.py")
@@ -17,7 +15,7 @@ def plotVeigen2(name):
 	Ef = T[1]
 	n2d = T[2]
 	z = T[3]
-	
+
 	V = T[4]
 	#utile ?
 	Vnew = T[5]
@@ -40,16 +38,16 @@ def plotVeigen2(name):
 	xlim(0,50)
 	ylim(0.,0.45)
 	plt.title("Eigenstates of the well n = "+str(n2d*10**(-4))+"cm-2")
-	plt.savefig('Well_eigen_lim.pdf')
+	savePicture('Well_eigen_lim.pdf')
 	plt.show()
-	
+
 def plotVeigen(name):
 	T = readIteration(name)
 	well_energies = T[0]
 	Ef = T[1]
 	n2d = T[2]
 	z = T[3]
-	
+
 	V = T[4]
 	#utile ?
 	Vnew = T[5]
@@ -57,7 +55,7 @@ def plotVeigen(name):
 	zred = [10**9*z[i] for i in range(len(z))]
 	for i in range(2):
 		for j in range(len(well_energies[i])):
-			if well_energies[i][j] < Ef:
+			if well_energies[i][j] > Ef:
 				#psi = renorm(eigenstate(z,well_energies[i][j],V,mz[i]))
 				psi = ith_eigenfuncacc(well_energies[i][j],mz[i],V,z)
 				psi = [well_energies[i][j] + p**2 for p in psi]
@@ -72,10 +70,11 @@ def plotVeigen(name):
 	xlim(0,50)
 	ylim(0.,0.45)
 	plt.title("Eigenstates of the well n = "+str(n2d*10**(-4))+"cm-2")
-	plt.savefig('Well_eigen_lim.pdf')
+
+	savePicture("Potential_eigen.pdf")
 	plt.show()
 
-#plot the total density of the file with the name name	
+#plot the total density of the file with the name name
 def plotDensity(name):
 	T = readIteration(name)
 	well_energies = T[0]
@@ -84,15 +83,15 @@ def plotDensity(name):
 	z = T[3]
 	zrev = [10**9*z[i] for i in range(len(z))]
 	V = T[4]
-	
+
 	P = rho3d_multiband(z,Ef,well_energies,band_energies,mx,my,mz,V,n2d)
-	
+
 	Vtild = newpotential(P,n2d,z)
-	
+
 	stepzzz = z[1]-z[0]
-	
+
 	Pscaled = [p/stepzzz * 10**(-27) for p in P]
-	
+
 	plt.plot(zrev,Pscaled,color = "Black")
 
 	plt.xlabel("z (nm)",fontsize = 20)
@@ -102,8 +101,9 @@ def plotDensity(name):
 	plt.title("Density near the interface",fontsize = 16)
 	xlim(0,50)
 	#ylim(0,1)
-	
-	plt.savefig('Density.pdf')
+
+	savePicture('Density.pdf')
+
 	plt.show()
 
 #plot the density of only the light band
@@ -115,17 +115,17 @@ def plotdxyDensityMulti(name):
 	z = T[3]
 	zrev = [10**9*z[i] for i in range(len(z))]
 	V = T[4]
-	
+
 	P = rho3d_band(z,Ef,well_energies,band_energies,mx,my,mz,V,n2d,0)
-	
+
 	print(sum(z[i]*P[i] for i in range(len(z)))/sum(P))
-	
+
 	Vtild = newpotential(P,n2d,z)
-	
+
 	stepzzz = z[1]-z[0]
-	
+
 	Pscaled = [p/stepzzz * 10**(-27) for p in P]
-	
+
 	plt.plot(zrev,Pscaled,label = name)
 
 	plt.xlabel("z (nm)")
@@ -133,7 +133,7 @@ def plotdxyDensityMulti(name):
 	xlim(0,50)
 	#ylim(0,1)
 	plt.title("Density of light bands near the interface")
-	
+
 #plot the density of only the heavy band
 def plotdxzDensityMulti(name):
 	T = readIteration(name)
@@ -143,17 +143,17 @@ def plotdxzDensityMulti(name):
 	z = T[3]
 	zrev = [10**9*z[i] for i in range(len(z))]
 	V = T[4]
-	
+
 	P = rho3d_band(z,Ef,well_energies,band_energies,mx,my,mz,V,n2d,1)
-	
+
 	print(sum(z[i]*P[i] for i in range(len(z)))/sum(P))
-	
+
 	Vtild = newpotential(P,n2d,z)
-	
+
 	stepzzz = z[1]-z[0]
-	
+
 	Pscaled = [p/stepzzz * 10**(-27) for p in P]
-	
+
 	plt.plot(zrev,Pscaled,label = name)
 
 	plt.xlabel("z (nm)")
@@ -168,14 +168,14 @@ def plotdxzMulti(state_number,name):
 	Ef = T[1]
 	n2d = T[2]
 	z = T[3]
-	
+
 	a = 3.9*10**(-10)
-	
+
 	V = T[4]
 	#utile ?
 	Vnew = T[5]
 	zred = [10**9*z[i] for i in range(len(z))]
-	
+
 	psi = ith_eigenfuncacc(well_energies[1][state_number],mz[1],V,z)
 	psicar = [abs(ps)**2 for ps in psi]
 	plt.plot(zred,psicar,label = str(name))
@@ -191,15 +191,15 @@ def plotdxyMulti(state_number,name):
 	Ef = T[1]
 	n2d = T[2]
 	z = T[3]
-	
+
 	a = 3.9*10**(-10)
 
-	
+
 	V = T[4]
 	#utile ?
 	Vnew = T[5]
 	zred = [10**9*z[i] for i in range(len(z))]
-	
+
 	psi = ith_eigenfuncacc(well_energies[0][state_number],mz[0],V,z)
 	psicar = [abs(ps)**2 for ps in psi]
 	plt.plot(zred,psicar,label = "xy"+str(state_number))
@@ -209,7 +209,7 @@ def plotdxyMulti(state_number,name):
 	#ylim(0,0.4)
 	plt.title("Eigenfunctions of the well, n2d = "+str(round(a**2*n2d,3))+" e per unit cell")
 
-	
+
 def plotDensityMulti(name):
 	T = readIteration(name)
 	well_energies = T[0]
@@ -218,15 +218,15 @@ def plotDensityMulti(name):
 	z = T[3]
 	zrev = [10**9*z[i] for i in range(len(z))]
 	V = T[4]
-	
+
 	P = rho3d_multiband(z,Ef,well_energies,band_energies,mx,my,mz,V,n2d)
-	
+
 	Vtild = newpotential(P,n2d,z)
-	
+
 	stepzzz = z[1]-z[0]
-	
+
 	Pscaled = [p/stepzzz * 10**(-27)/n2d for p in P]
-	
+
 	plt.plot(zrev,Pscaled,label = str(n2d*(3.9*10**(-10))**2))
 
 	plt.xlabel("z (nm)",fontsize = 20)
@@ -234,7 +234,7 @@ def plotDensityMulti(name):
 	xlim(0,50)
 	#ylim(0,1)
 	plt.title("Density near the interface",fontsize = 16)
-	
+
 def plotElectronicDensity(name):
 	T = readIteration(name)
 	well_energies = T[0]
@@ -242,32 +242,32 @@ def plotElectronicDensity(name):
 	n2d = T[2]
 	z = T[3]
 	V = T[4]
-	
+
 	P = rho3d_multiband(z,Ef,well_energies,band_energies,mx,my,mz,V,n2d)
-	
-	
+
+
 	a = 3.9*10**(-10)
-	
+
 	cell_size = int(a/stepz)
-	
+
 	N_cell = int(len(z)/cell_size)
-	
+
 	zred = [i for i in range(N_cell)]
-	
+
 	P2 = [sum(P[cell+cell_size*ncell]*a**2 for cell in range(cell_size)) for ncell in range(N_cell)]
-	
+
 	print(sum(z[i]*P[i] for i in range(len(z)))/sum(P))
-	
+
 	plt.plot(zred,P2,color = "Black")
-	
+
 	plt.xlabel("z (UC)")
 	plt.ylabel("Density (electron per layer)")
 	xlim(0,20)
 	#ylim(10**(-4),1)
 	plt.title("Density near the interface")
-	plt.savefig('DensityE.pdf')
+	savePicture('DensityE.pdf')
 	plt.show()
-	
+
 def computeError(name):
 	T = readIteration(name)
 	Vanc = T[4]
@@ -288,7 +288,7 @@ def plotEnerg(file_number):
 	return 1
 
 def plotVanc(file_number):
-	
+
 	T = readIteration(str(file_number))
 	Ef = T[1]
 	z = T[3]
@@ -309,26 +309,26 @@ def plotepsilon(file_number):
 	Ef = T[1]
 	n2d = T[2]
 	z = T[3]
-	
+
 	V = T[4]
-	
+
 	zred = [zz * 10**9 for zz in z]
-	
+
 	P = rho3d_multiband(z,Ef,well_energies,band_energies,mx,my,mz,V,n2d)
-	
+
 	Pscaled = [p/stepz * 10**(-27) for p in P]
-	
+
 	tabE = [0 for i in range(len(z))]
-	
+
 	for i in range(len(z)-1):
 		tabE[i] = (V[i+1]-V[i])/stepz
-		
+
 	print(sum(tabE[i]*P[i] for i in range(len(tabE)))/sum(P ))
 	print(sum(z[i]*P[i] for i in range(len(z)))/sum(P ))
 	print(sum(z[i]**2*P[i] for i in range(len(z)))/sum(P ))
-	
+
 	a = 3.9*10**(-10)
-	
+
 
 	fig, ax1 = plt.subplots()
 
@@ -341,21 +341,21 @@ def plotepsilon(file_number):
 	ax2.set_ylabel("E ($V.m^{-1}$)", color='b')
 
 	plt.show()
-	
+
 def Efinal(file_number):
 	T = readIteration(str(file_number))
 	Ef = T[1]
 	z = T[3]
 	V = T[4]
 	return [Ef,(V[-1]-V[-2])/(z[1]-z[0])*5*10**(-4)]
-	
 
-numberfile = 17
 
-os.chdir("/Users/Pierre/Desktop/Stage_4A/Poisson_Schrodinger/Simulations/Results16111accu/")
+numberfile = 8
+
+os.chdir("Results16alter111")
 
 tabEf = [0 for i in range(numberfile+1)]
-tabV = [0 for i in range(numberfile+1)] 
+tabV = [0 for i in range(numberfile+1)]
 
 for j in range(numberfile+1):
 	print(computeError(str(j)))
@@ -384,7 +384,7 @@ for j in range(numberfile+1):
 
 
 #plotVanc(i)
-plotEnerg(i)
+#plotEnerg(i)
 plotVeigen(str(i))
 
 #plotepsilon(i)

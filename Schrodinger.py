@@ -29,7 +29,7 @@ def schrodinger(sol,z,stepz,E,V,mt):
 	dpsi = sol[1]
 	el = 1.6*10**(-19)
 	if - E + interpolation(V,z,stepz) > 0 and z > 4*stepz:
-		if signum(sol[0]) == signum(sol[1]) or sol[2]!= 0:			
+		if signum(sol[0]) == signum(sol[1]) or sol[2]!= 0:
 			return [0,0,1]
 		else:
 			g = mt/(h**2)*el*(- E + interpolation(V,z,stepz))*sol[0]
@@ -52,7 +52,7 @@ def short_solver2(energy,V,z,m):
 	#ind = len(z)
     #spatial limitation of the z coordinate to solve only where the solution is stable numerically
 
-	bo = 0 
+	bo = 0
 	warnings.filterwarnings('error')
 	while bo == 0:
 		bo = 1
@@ -73,15 +73,15 @@ def short_solver2(energy,V,z,m):
 	y_ode /= sqrt(norm(y_ode))
 	warnings.filterwarnings('default')
 	return y_ode
-	
+
 def short_solver(energy,V,z,m):
 	CI_tableau = [0,0,0]
 	CI_tableau[0] = 0.
 	CI_tableau[1] = 0.1
 	stepz = abs(z[1]-z[0])
-    
+
 	y_ode = [0 for i in range(len(z))]
-    
+
 	sol_ode = odeint(schrodinger,CI_tableau,z,(stepz,energy,V,m))
 	#maybe all these steps aint necessary anymore
 	for i in range(len(z)):
@@ -97,10 +97,10 @@ def short_solverderiv(energy,V,z,m):
 	CI_tableau[0] = 0.
 	CI_tableau[1] = 0.1
 	stepz = z[1]-z[0]
-    
+
 	y_ode = [0 for i in range(len(z))]
 	y_ode2 = [0 for i in range(len(z))]
-    
+
 	sol_ode = odeint(schrodinger,CI_tableau,z,(stepz,energy,V,m))
 	#maybe all these steps aint necessary anymore
 	for i in range(len(z)):
@@ -111,8 +111,8 @@ def short_solverderiv(energy,V,z,m):
 		for i in range(len(z)):
 			y_ode2[i] /= normy
 	return y_ode2
-    
-    
+
+
 #to find the eigenvalues of the schrodinger equation which are vanishing at infinity, uses tricks to count sign changes of the wavefunction. dichotomy. Searching for the i-th evanescent state in the potential V, seeking from the energy Egs, with the accuracy acc and the mass m for the particle
 def finding_eigenval_i(z,Egs,V,m,i,acc):
 	#initializing the dichotomy loop
@@ -138,7 +138,7 @@ def finding_eigenval_i(z,Egs,V,m,i,acc):
         else:
             Emax = Emil
     return Emax
-    
+
 #compute the eigenstate associated to an energy level E, in the approximation of a localized state. fills the end of the values of the eigenfunctions if needed. Need to use renorm then to have proper "vanishing" eigenfunctions
 def eigenstate(z,E,V,m):
     CI_tableau = np.zeros(3)
@@ -151,7 +151,7 @@ def eigenstate(z,E,V,m):
     nory = norm(y_ode)
     y_ode = [y/nory for y in y_ode]
     return y_ode
-      
+
 
 #see Schrodinger for more explanation
 #set to zero all the value that are equal at the end, then normalize the wf
@@ -200,7 +200,7 @@ def indexlastzero(psi):
 	while signum(psi[index0]) == inisign:
 		index0 -= 1
 
-#to count the sign change of an wavefunction   
+#to count the sign change of an wavefunction
 def counting_sign(psi):
     counter = 0
     sign_ini = signum(psi[1])
@@ -232,7 +232,7 @@ def VequalsEindex(V,E):
 		if index == len(V)-1:
 			return len(V)
 	return index
-	
+
 def VequalsEmaxindex(V,E,z,mz):
 	index = 0
 	index0 = VequalsEindex(V,E)
@@ -246,21 +246,21 @@ def VequalsEmaxindex(V,E,z,mz):
 def rightSolver(energy,V,z,m):
 	index = VequalsEindex(V,energy)
 	zreverse = [z[len(z)-1-i] for i in range(len(z)-index)]
-	
+
 	CI_tableau = [0.1,-0.1]
-	
+
 	sol_odetild = odeint(schrodinger2,CI_tableau,zreverse,(stepz,energy,V,m))
 	y_odetild = sol_odetild[:,0]
 	y_odetild2 = sol_odetild[:,1]
-	
+
 	normtild = norm(y_odetild)
-	
+
 	for i in range(index):
 		y_odetild[i] /= normtild
 		y_odetild2[i] /= normtild
-	
+
 	return [y_odetild,y_odetild2]
-	
+
 #to solve the part right to the point where V = E of the Schrodinger equation
 def rightSolver2(energy,V,z,m):
 
@@ -268,20 +268,20 @@ def rightSolver2(energy,V,z,m):
 	stepz = abs(z[1]-z[0])
 	index2 = VequalsEmaxindex(V,energy,z,m)
 	zreverse = [z[index2-i] for i in range(index2-index)]
-	
+
 	Vreverse = [V[index2-i] for i in range(index2-index)]
-	
+
 	CI_tableau = [0.1,-0.1]
-	
+
 	sol_odetild = odeint(schrodinger2,CI_tableau,zreverse,(stepz,energy,V,m))
 	y_odetild = sol_odetild[:,0]
 	y_odetild2 = sol_odetild[:,1]
-	
-	
+
+
 	return [y_odetild,y_odetild2]
-	
-	
-#more accurate method to compute the eigenvalues of the problem. Compute the number of sign change, and then if the number of sign change is correct one computes the right part of the wavefunction. Then one looks at the branching of the wf at the contact point 
+
+
+#more accurate method to compute the eigenvalues of the problem. Compute the number of sign change, and then if the number of sign change is correct one computes the right part of the wavefunction. Then one looks at the branching of the wf at the contact point
 def finding_accurate_eigen(z,Egs,V,mr,nzeros,acc):
 	#initializing the dichotomy loop
 	Emin = Egs
@@ -316,14 +316,14 @@ def finding_accurate_eigen(z,Egs,V,mr,nzeros,acc):
 				psicomplete[k] = psi[k]
 			for k in range(len(yy)):
 				psicomplete[index+k] = yy[len(yy)-1-k]
-				
+
 			ncomplete = norm(psicomplete)
-			
+
 			for j in range(len(z)):
 				psicomplete[j] /= ncomplete
-			
+
 			#plot(z,psicomplete,label=Emil)
-			
+
 			if (-1)**nzeros * yyderiv[-1]*psi[index]/const < (-1)**nzeros * psideriv[index]:
 				Emin = Emil
 			else:
@@ -333,8 +333,8 @@ def finding_accurate_eigen(z,Egs,V,mr,nzeros,acc):
 		else:
 			Emax = Emil
 	return Emil
-	
-	
+
+
 def ith_eigenfuncacc(energy,mz,V,z):
 	psi = short_solver(energy,V,z,mz)
 	Ty = rightSolver2(energy,V,z,mz)
@@ -347,10 +347,10 @@ def ith_eigenfuncacc(energy,mz,V,z):
 	for k in range(index):
 		psicomplete[k] = psi[k]
 	for k in range(len(yy)):
-		psicomplete[index+k] = yy[len(yy)-1-k]	
+		psicomplete[index+k] = yy[len(yy)-1-k]
 	ncomplete = norm(psicomplete)
-			
+
 	for j in range(len(z)):
 		psicomplete[j] /= ncomplete
-		
+
 	return psicomplete

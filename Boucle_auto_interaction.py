@@ -1,10 +1,7 @@
-import os
-chemin = "/Users/Pierre/Desktop/Stage_4A/Poisson_Schrodinger/Simulations/src"
-os.chdir(chemin)
 execfile("Poisson.py")
 execfile("Schrodinger.py")
 execfile("DOS.py")
-execfile("Interaction.py")
+execfile("interact.py")
 execfile("Files.py")
 
 def ksiDyn(Vanc,Vnew):
@@ -30,25 +27,25 @@ def autocoherentLoopInitInt(Nspectrumz,acc,surf_density,U,U1):
 		well_energies[1][i] = finding_eigenval_i(z,energ,V,mz[1],i,acc)
 		energ = well_energies[1][i]
 		well_energies[2][i] = well_energies[1][i]
-    
+
 	Ef = findingFermiEnergy2(well_energies,band_energies,mx,my,surf_density)
-	
-	Tab2 = interaction_loop(well_energies,band_energies,mx,my,surf_density,Ef,U,U1,40)
-	
+
+	Tab2 = interaction_loop(well_energies,band_energies,mx,my,surf_density,Ef,U,100)
+
 	Ef2 = Tab2[1]
 	intenerg = Tab2[2]
-	
+
 	total_energy = sum_tab_energies(well_energies,intenerg)
-	
+
 	P = rho3d_multiband_int(z,Ef2,well_energies,band_energies,mx,my,mz,V,surf_density,intenerg)
 	#plot(zr,P,label=j)
-    
+
 	Vtild = newpotential(P,surf_density,z)
-    
+
 	saveIterationint(0,well_energies,Ef2,z,V,Vtild,surf_density,intenerg,U,U1)
-    
+
 	return 1
-    
+
 #read the file number j
 def autocoherentLoopOneStepint(Nspectrumz,acc,file_number,U,U1):
 	TT = readIterationint(str(file_number))
@@ -63,7 +60,7 @@ def autocoherentLoopOneStepint(Nspectrumz,acc,file_number,U,U1):
 	ksi = ksiDyn(V,Vtild)
 	energ = 0
 	energz = 0
-	
+
 	V = potential_corrected(V,Vtild,ksi)
 	for i in range(Nspectrumz):
 		well_energies[0][i] = finding_accurate_eigen(z,energz,V,mz[0],i,acc)
@@ -72,35 +69,36 @@ def autocoherentLoopOneStepint(Nspectrumz,acc,file_number,U,U1):
 		energ = well_energies[1][i]
 		well_energies[2][i] = well_energies[1][i]
 	Ef = findingFermiEnergy2(well_energies,band_energies,mx,my,surf_density)
-	
-	Tab2 = interaction_loop(well_energies,band_energies,mx,my,surf_density,Ef,U,U1,40)
-	
+
+	Tab2 = interaction_loop(well_energies,band_energies,mx,my,surf_density,Ef,U,100)
+
 	Ef2 = Tab2[1]
 	intenerg = Tab2[2]
-	
+
 	P = rho3d_multiband_int(z,Ef2,well_energies,band_energies,mx,my,mz,V,surf_density,intenerg)
-	
+
 	#plot(zr,P,label=j)
 	Vtild = newpotential(P,surf_density,z)
 	saveIterationint(file_number+1,well_energies,Ef2,z,V,Vtild,surf_density,intenerg,U,U1)
 	return 1
- 
+
 def nextLoop(Nspectrumz,acc):
 	k = nextFileNumber()
-	U = 2
+	U = 6
 	U1 = 0
 	print(k)
-	surf_density = 1.2*10**18
+	surf_density = 1.6*10**18
 	if k == 0:
 		autocoherentLoopInitInt(Nspectrumz,acc,surf_density,U,U1)
 	else:
 		autocoherentLoopOneStepint(Nspectrumz,acc,k-1,U,U1)
 	return 1
- 
 
-makeFold("IResults12",chemin)
-   
-Nspectrumz = 8
+makeFold("IResults16U1",os.getcwd())
+
+
+
+Nspectrumz = 4
 acc = 0.0001
 for l in range(10):
 	nextLoop(Nspectrumz,acc)
